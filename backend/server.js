@@ -23,20 +23,6 @@ cloudinary
 app.use(express.json())
 app.use(cors())
 
-const allowedOrigins = [
-    'https://forever-frontend-bice-omega.vercel.app',
-    'https://forever-admin-inky.vercel.app'
-  ];
-  app.use(cors({
-    origin: function (origin, callback) {
-      if (!origin || allowedOrigins.includes(origin)) {
-        callback(null, true);
-      } else {
-        callback(new Error('Not allowed by CORS'));
-      }
-    },
-    credentials: true
-  }));
 
 //api endpoints
 app.use('/api/user',userRouter)
