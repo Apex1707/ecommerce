@@ -8,47 +8,43 @@ import productRouter from './routes/productRoute.js'
 import cartRouter from './routes/cartRoute.js'
 import orderRouter from './routes/orderRoute.js'
 
+const app = express()
 
-//App config
-
-const app=express()
-const port =process.env.PORT || 4000
-connectDB()
-cloudinary
-
-
-const allowedOrigins = [
-    'https://forever-frontend-bice-omega.vercel.app',
-    'https://forever-admin-inky.vercel.app'
-];
-
+// Remove second cors middleware and place it before routes
 app.use(cors({
-    origin: function (origin, callback) {
-        if (!origin || allowedOrigins.includes(origin)) {
-            callback(null, true)
-        } else {
-            callback(new Error('Not allowed by CORS'))
-        }
-    },
-    credentials: true
+    origin: ['https://forever-frontend-bice-omega.vercel.app', 'https://forever-admin-inky.vercel.app'],
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    credentials: true,
+    allowedHeaders: ['Content-Type', 'Authorization', 'token']
 }))
-  
 
-//middlewares
+// Middleware
 app.use(express.json())
-app.use(cors())
 
-
-
-//api endpoints
-app.use('/api/user',userRouter)
-app.use('/api/product',productRouter)
-app.use('/api/cart',cartRouter)
-app.use('/api/order',orderRouter)
-
-//api endpoints
-app.get('/',(req,res)=>{
-    res.send("API Working")
+// Routes
+app.get('/', (req, res) => {
+    res.json({ message: "API Working" })
 })
 
-app.listen(port,()=>console.log('Server started on PORT:'+port))
+app.use('/api/user', userRouter)
+app.use('/api/product', productRouter)
+app.use('/api/cart', cartRouter)
+app.use('/api/order', orderRouter)
+
+// Error handling
+app.use((err, req, res, next) => {
+    console.error(err.stack)
+    res.status(500).json({ success: false, message: err.message })
+})
+
+// Connect to MongoDB
+connectDB()
+
+// For local development
+if (process.env.NODE_ENV !== 'production') {
+    const port = process.env.PORT || 4000
+    app.listen(port, () => console.log('Server started on PORT:' + port))
+}
+
+// For Vercel
+export default app
