@@ -17,7 +17,22 @@ connectDB()
 cloudinary
 
 
-  
+  const allowedOrigins = [
+  'https://forever-frontend-bice-omega.vercel.app',
+  'https://forever-admin-inky.vercel.app'
+]
+
+app.use(cors({
+  origin: function (origin, callback) {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true)
+    } else {
+      callback(new Error('Not allowed by CORS'))
+    }
+  },
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  credentials: true
+}))
 
 //middlewares
 app.use(express.json())
